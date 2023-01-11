@@ -1,3 +1,12 @@
+#' Read EPTS data
+#'
+#' @param data Path to a raw data txt file.
+#' @param metadata Path to a format specification xml file.
+#'
+#' @return A data frame containing a representation of the EPTS data.
+#' @export
+#'
+#' @examples
 read_epts <- function(data, metadata) {
 
   data <- split(
@@ -17,8 +26,3 @@ read_epts <- function(data, metadata) {
   )
 
 }
-
-
-gsub(x = "ads1232,232l;", pattern = "[;,]", replacement = "")
-
-
