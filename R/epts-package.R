@@ -2,6 +2,8 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom data.table rbindlist
+#' @importFrom data.table setDF
 #' @importFrom rlang sym
 #' @importFrom stats na.omit
 #' @importFrom stats setNames

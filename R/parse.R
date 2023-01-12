@@ -1,5 +1,18 @@
+read_xml_ <- function(...) {
+  withCallingHandlers(
+    expr = read_xml(...),
+    warning = \(w) if (startsWith(conditionMessage(w),
+                                  "Unsupported version")) {
+      invokeRestart("muffleWarning")
+    }
+  )
+}
+
 find_dfs <- function(metadata) {
-  xml_find_all(read_xml(metadata), "//DataFormatSpecification")
+  xml_find_all(
+    x = read_xml_(metadata, options = "NOWARNING"),
+    "//DataFormatSpecification"
+  )
 }
 
 parse_framing <- function(metadata) {
@@ -8,6 +21,9 @@ parse_framing <- function(metadata) {
     c("startFrame", "endFrame"),
     f = function(x) as.numeric(sapply(find_dfs(metadata), xml_attr, attr = x))
   )
+
+
+  find_dfs(metadata)
 
   start_frame <- eval(sym("startFrame"), framing)
   end_frame   <- eval(sym("endFrame"),   framing)
@@ -61,7 +77,7 @@ parse_separators <- function(metadata, regex = TRUE) {
 
   separators <- xml_attr(
     attr = "separator",
-    xml_find_all(x = read_xml(x = metadata),
+    xml_find_all(x = read_xml_(x = metadata, options = "NOWARNING"),
                  xpath = "DataFormatSpecifications//*")
   )
 
