@@ -1,0 +1,52 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# epts
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/george-wood/epts/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/george-wood/epts/actions/workflows/R-CMD-check.yaml)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+epts is a package for reading data that follows the [Electronic Performance and Tracking Systems (EPTS) standard data format](https://www.fifa.com/technical/football-technology/standards/epts/research-development-epts-standard-data-format) into R.
+It provides functions to parse metadata and data format specifications, as provided in an `.xml` file. It uses these specifications to imports the raw data `.txt` file and return a data frame. 
+
+The package makes it easy to import any EPTS data that follows the standard format into R.
+
+## Installation
+
+You can install the development version of epts from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("george-wood/epts")
+```
+
+## Usage
+
+This example imports the [example data provided by FIFA](https://www.fifa.com/technical/football-technology/standards/epts/research-development-epts-standard-data-format):
+
+```{r example}
+library(epts)
+
+# player and ball tracking data
+raw_data <- epts_example("fifa_example.txt")
+
+# metadata and data format specification file
+metadata <- epts_example("fifa_example.xml")
+
+# import the example data
+read_epts(raw_data, metadata)
+```

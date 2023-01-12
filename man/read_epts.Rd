@@ -17,3 +17,8 @@ A data frame containing a representation of the EPTS data.
 \description{
 Read EPTS data
 }
+\examples{
+data <- epts_example("fifa_example.txt")
+metadata <- epts_example("fifa_example.xml")
+read_epts(data, metadata)
+}

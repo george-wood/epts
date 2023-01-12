@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' data <- epts_example("fifa_example.txt")
-#' metadata <- epts_example("fifa_example.xml)
+#' metadata <- epts_example("fifa_example.xml")
 #' read_epts(data, metadata)
 read_epts <- function(data, metadata) {
 
