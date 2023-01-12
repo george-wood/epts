@@ -12,6 +12,7 @@ Import Electronic Performance and Tracking Systems (EPTS) data into R. Reads a r
 Useful links:
 \itemize{
   \item \url{https://github.com/george-wood/epts}
+  \item \url{http://gwood.me/epts/}
   \item Report bugs at \url{https://github.com/george-wood/epts/issues}
 }
 
