@@ -28,9 +28,9 @@ EPTS data. The standard format requires data providers to produce two
 documents when exchanging data:
 
 - A raw data file, which contains the actual data in a format that can
-  be parsed line by line
+  be parsed line by line.
 - An xml file containing metadata and a data format specification that
-  defines the format of the raw data file
+  defines the format of the raw data file.
 
 The epts package makes it easy to read the raw data file according to
 the data format specification.
@@ -39,8 +39,9 @@ the data format specification.
 
 With epts, you can:
 
-- Import the raw data file according to the data format specification
-- Extract metadata
+- Import the raw data file according to the data format specification.
+- Extract metadata, including specific fields such as the frame rate or
+  team names.
 
 When importing raw data, epts returns a `data.frame` with column names
 as defined in the data format specification. For flexibility, the
