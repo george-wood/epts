@@ -15,15 +15,14 @@ find_dfs <- function(metadata) {
   )
 }
 
-parse_framing <- function(metadata) {
+parse_frame <- function(metadata) {
 
   framing <- Map(
     c("startFrame", "endFrame"),
     f = function(x) as.numeric(sapply(find_dfs(metadata), xml_attr, attr = x))
   )
 
-
-  find_dfs(metadata)
+  # find_dfs(metadata)
 
   start_frame <- eval(sym("startFrame"), framing)
   end_frame   <- eval(sym("endFrame"),   framing)
@@ -38,42 +37,28 @@ parse_framing <- function(metadata) {
 
 }
 
-parse_channels <- function(metadata) {
+parse_channel <- function(metadata) {
 
-  data_format_specification <- find_dfs(metadata)
-
-  var_channel <- lapply(
-    data_format_specification,
+  lapply(
+    find_dfs(metadata),
     FUN = function(x) {
-      xml_attr(attr = "name",
-               xml_find_all(x, "StringRegister"))
+      mapply(
+        FUN = function(attr, xpath) {
+          xml_attr(attr = attr, x = xml_find_all(x, xpath))
+        },
+        attr  = c("name",
+                  "playerChannelId",
+                  "channelId"),
+        xpath = c("StringRegister",
+                  "SplitRegister/SplitRegister/PlayerChannelRef",
+                  "SplitRegister/BallChannelRef")
+      )
     }
   )
-
-  player_channel <- lapply(
-    data_format_specification,
-    FUN = function(x) {
-      xml_attr(attr = "playerChannelId",
-               xml_find_all(x, "SplitRegister/SplitRegister/PlayerChannelRef"))
-    }
-  )
-
-  ball_channel <- lapply(
-    data_format_specification,
-    FUN = function(x) {
-      xml_attr(attr = "channelId",
-               x = xml_find_all(x, "SplitRegister/BallChannelRef"))
-    }
-  )
-
-  Map(c,
-      var_channel,
-      player_channel,
-      ball_channel)
 
 }
 
-parse_separators <- function(metadata, regex = TRUE) {
+parse_separator <- function(metadata, regex = TRUE) {
 
   separators <- xml_attr(
     attr = "separator",

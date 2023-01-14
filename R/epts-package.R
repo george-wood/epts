@@ -3,6 +3,7 @@
 
 ## usethis namespace: start
 #' @importFrom data.table rbindlist
+#' @importFrom data.table setcolorder
 #' @importFrom data.table setDF
 #' @importFrom rlang sym
 #' @importFrom stats na.omit
