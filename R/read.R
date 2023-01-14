@@ -12,27 +12,38 @@
 #' read_epts(data, metadata)
 read_epts <- function(data, metadata) {
 
-  data <- split(
-    x = read.table(
-      text = gsub(x = readLines(data, warn = FALSE),
-                  pattern = parse_separator(metadata, regex = TRUE),
-                  replacement = " ",
-                  perl = TRUE)
+  split_data <- withCallingHandlers(
+    expr = split(
+      x = read.table(
+        text = gsub(x = readLines(data, warn = FALSE),
+                    pattern = parse_separator(metadata, regex = TRUE),
+                    replacement = " ",
+                    perl = TRUE)
+      ),
+      f = parse_frame(metadata)
     ),
-    f = parse_frame(metadata)
+    warning = \(w) if (startsWith(conditionMessage(w), "data length")) {
+      warning(
+        call. = FALSE,
+        "Frames in data are undefined in metadata."
+      )
+      invokeRestart("muffleWarning")
+    }
   )
 
-  channel <- parse_channel(metadata)
-  channel_order <- unlist(sapply(c('name','playerChannelId', 'channelId'),
-                          function(x) unique(unlist(lapply(channel, `[[`, x)))))
+  channel       <- parse_channel(metadata)
+  channel_order <- unlist(
+    sapply(X   = c('name','playerChannelId', 'channelId'),
+           FUN = function(x) unique(unlist(lapply(channel, `[[`, x))))
+  )
 
-  data.table::setDF(
-    x = data.table::setcolorder(
+  setDF(
+    x = setcolorder(
       neworder = channel_order,
-      x = data.table::rbindlist(
+      x = rbindlist(
         l = mapply(
-          FUN = function(data, cols) setNames(object = data, nm = cols),
-          data = data,
+          FUN  = function(data, cols) setNames(object = data, nm = cols),
+          data = split_data,
           cols = lapply(X = channel, FUN = rapply, f = c),
           SIMPLIFY = FALSE
         ),
@@ -43,3 +54,4 @@ read_epts <- function(data, metadata) {
   )[]
 
 }
+

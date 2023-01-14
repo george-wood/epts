@@ -78,7 +78,7 @@ readLines(raw_data, warn = FALSE)
 metadata <- epts_example("fifa_example.xml")
 ```
 
-Import the raw data using the format specification:
+Import the raw data according to the format specification:
 
 ``` r
 read_epts(raw_data, metadata)

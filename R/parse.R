@@ -11,7 +11,7 @@ read_xml_ <- function(...) {
 find_dfs <- function(metadata) {
   xml_find_all(
     x = read_xml_(metadata, options = "NOWARNING"),
-    "//DataFormatSpecification"
+    xpath = path_DataFormatSpecification()
   )
 }
 
@@ -21,8 +21,6 @@ parse_frame <- function(metadata) {
     c("startFrame", "endFrame"),
     f = function(x) as.numeric(sapply(find_dfs(metadata), xml_attr, attr = x))
   )
-
-  # find_dfs(metadata)
 
   start_frame <- eval(sym("startFrame"), framing)
   end_frame   <- eval(sym("endFrame"),   framing)
@@ -46,12 +44,12 @@ parse_channel <- function(metadata) {
         FUN = function(attr, xpath) {
           xml_attr(attr = attr, x = xml_find_all(x, xpath))
         },
-        attr  = c("name",
-                  "playerChannelId",
-                  "channelId"),
-        xpath = c("StringRegister",
-                  "SplitRegister/SplitRegister/PlayerChannelRef",
-                  "SplitRegister/BallChannelRef")
+        attr  = c(attr_name(),
+                  attr_playerChannelId(),
+                  attr_channelId()),
+        xpath = c(path_name(),
+                  path_playerChannelId(),
+                  path_channelId())
       )
     }
   )
@@ -60,13 +58,13 @@ parse_channel <- function(metadata) {
 
 parse_separator <- function(metadata, regex = TRUE) {
 
-  separators <- xml_attr(
-    attr = "separator",
-    xml_find_all(x = read_xml_(x = metadata, options = "NOWARNING"),
-                 xpath = "DataFormatSpecifications//*")
+  separator <- xml_attr(
+    attr = attr_separator(),
+    x = xml_find_all(x = read_xml_(x = metadata, options = "NOWARNING"),
+                     xpath = path_separator())
   )
 
-  res <- paste0(unique(na.omit(separators)), collapse = "")
+  res <- paste0(unique(na.omit(separator)), collapse = "")
 
   if (regex) paste0("[", res, "]") else res
 
