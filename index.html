@@ -103,7 +103,7 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/george-wood/epts" class="external-link">epts</a></span><span class="op">)</span></span></code></pre></div>
 <p>The package includes <a href="https://www.fifa.com/technical/football-technology/standards/epts/research-development-epts-standard-data-format" class="external-link">example data</a> provided by FIFA:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># player and ball tracking data</span></span>
+<code class="sourceCode R"><span><span class="co"># txt file including player and ball tracking data</span></span>
 <span><span class="va">raw_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/epts_example.html">epts_example</a></span><span class="op">(</span><span class="st">"fifa_example.txt"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="va">raw_data</span>, warn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "1779143:-769,-2013,-500,100,9.63,9.80,4,5,177,182;-461,-615,-120,99,900,9.10,4,5,170,179;-2638,3478,120,110,1.15,5.20,3,4,170,175;:-2656,367,100:"</span></span>
@@ -114,8 +114,7 @@
 <p>Import the raw data according to the format specification:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/read_epts.html">read_epts</a></span><span class="op">(</span><span class="va">raw_data</span>, <span class="va">metadata</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in split.default(x = seq_len(nrow(x)), f = f, drop = drop, ...): data</span></span>
-<span><span class="co">#&gt; length is not a multiple of split variable</span></span>
+<span><span class="co">#&gt; Warning: Frames in data are undefined in metadata.</span></span>
 <span><span class="co">#&gt;   frameCount player1_x player1_y player1_z player1_distance player1_avg_speed</span></span>
 <span><span class="co">#&gt; 1    1779143      -769     -2013      -500              100              9.63</span></span>
 <span><span class="co">#&gt; 2    1779144      -218      1193      2000              100              1.23</span></span>
