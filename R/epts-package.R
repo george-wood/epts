@@ -6,7 +6,6 @@
 #' @importFrom data.table setcolorder
 #' @importFrom data.table setDF
 #' @importFrom rlang sym
-#' @importFrom stats na.omit
 #' @importFrom stats setNames
 #' @importFrom utils read.table
 #' @importFrom xml2 read_xml

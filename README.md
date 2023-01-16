@@ -68,7 +68,7 @@ data](https://www.fifa.com/technical/football-technology/standards/epts/research
 provided by FIFA:
 
 ``` r
-# player and ball tracking data
+# txt file including player and ball tracking data
 raw_data <- epts_example("fifa_example.txt")
 readLines(raw_data, warn = FALSE)
 #> [1] "1779143:-769,-2013,-500,100,9.63,9.80,4,5,177,182;-461,-615,-120,99,900,9.10,4,5,170,179;-2638,3478,120,110,1.15,5.20,3,4,170,175;:-2656,367,100:"
@@ -82,8 +82,7 @@ Import the raw data according to the format specification:
 
 ``` r
 read_epts(raw_data, metadata)
-#> Warning in split.default(x = seq_len(nrow(x)), f = f, drop = drop, ...): data
-#> length is not a multiple of split variable
+#> Warning: Frames in data are undefined in metadata.
 #>   frameCount player1_x player1_y player1_z player1_distance player1_avg_speed
 #> 1    1779143      -769     -2013      -500              100              9.63
 #> 2    1779144      -218      1193      2000              100              1.23

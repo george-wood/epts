@@ -61,7 +61,7 @@ library(epts)
 The package includes [example data](https://www.fifa.com/technical/football-technology/standards/epts/research-development-epts-standard-data-format) provided by FIFA:
 
 ```{r example}
-# player and ball tracking data
+# txt file including player and ball tracking data
 raw_data <- epts_example("fifa_example.txt")
 readLines(raw_data, warn = FALSE)
 

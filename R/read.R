@@ -12,24 +12,26 @@
 #' read_epts(data, metadata)
 read_epts <- function(data, metadata) {
 
-  split_data <- withCallingHandlers(
-    expr = split(
-      x = read.table(
-        text = gsub(x = readLines(data, warn = FALSE),
-                    pattern = parse_separator(metadata, regex = TRUE),
-                    replacement = " ",
-                    perl = TRUE)
+  split_data <-
+    withCallingHandlers(
+      expr = split(
+        x = read.table(
+          text = gsub(x = readLines(data, warn = FALSE),
+                      pattern = parse_separator(metadata, regex = TRUE),
+                      replacement = " ",
+                      perl = TRUE)
+        ),
+        f = parse_frame(metadata)
       ),
-      f = parse_frame(metadata)
-    ),
-    warning = \(w) if (startsWith(conditionMessage(w), "data length")) {
-      warning(
-        call. = FALSE,
-        "Frames in data are undefined in metadata."
-      )
-      invokeRestart("muffleWarning")
-    }
-  )
+      warning = function(w) {
+        if (startsWith(conditionMessage(w), "data length")) {
+          warning(call. = FALSE,
+                  "Frames in data are undefined in metadata.")
+          invokeRestart("muffleWarning")
+
+        }
+      }
+    )
 
   channel       <- parse_channel(metadata)
   channel_order <- unlist(
@@ -55,3 +57,14 @@ read_epts <- function(data, metadata) {
 
 }
 
+
+read_xml_ <- function(...) {
+  withCallingHandlers(
+    expr = read_xml(...),
+    warning = function(w) {
+      if (startsWith(conditionMessage(w), "Unsupported version")) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}
