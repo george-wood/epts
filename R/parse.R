@@ -8,7 +8,7 @@ parse_frame <- function(metadata) {
   start_frame <- eval(sym("startFrame"), framing)
   end_frame   <- eval(sym("endFrame"),   framing)
 
-  findInterval(
+  x <- findInterval(
     x                = min(start_frame):max(end_frame),
     vec              = end_frame,
     rightmost.closed = FALSE,
@@ -16,8 +16,11 @@ parse_frame <- function(metadata) {
     left.open        = TRUE
   )
 
-}
+  attr(x, "start_frame") <- start_frame
+  attr(x, "end_frame")   <- end_frame
+  x
 
+}
 
 parse_channel <- function(metadata) {
 

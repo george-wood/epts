@@ -12,40 +12,39 @@
 #' read_epts(data, metadata)
 read_epts <- function(data, metadata) {
 
-  split_data <-
+  check_input(data, metadata)
+
+  x <- read.table(
+    text = gsub(x = readLines(data, warn = FALSE),
+                pattern = parse_separator(metadata, regex = TRUE),
+                replacement = " ",
+                perl = TRUE)
+  )
+
+  chunked <-
     withCallingHandlers(
-      expr = split(
-        x = read.table(
-          text = gsub(x = readLines(data, warn = FALSE),
-                      pattern = parse_separator(metadata, regex = TRUE),
-                      replacement = " ",
-                      perl = TRUE)
-        ),
-        f = parse_frame(metadata)
-      ),
+      expr = split(x, f = parse_frame(metadata)),
       warning = function(w) {
         if (startsWith(conditionMessage(w), "data length")) {
           warning(call. = FALSE,
-                  "Frames in data are undefined in metadata.")
+                  "Frames in `data` are undefined in `metadata`.")
           invokeRestart("muffleWarning")
-
         }
       }
     )
 
-  channel       <- parse_channel(metadata)
-  channel_order <- unlist(
-    sapply(X   = c('name','playerChannelId', 'channelId'),
-           FUN = function(x) unique(unlist(lapply(channel, `[[`, x))))
-  )
+  channel <- parse_channel(metadata)
 
   setDF(
     x = setcolorder(
-      neworder = channel_order,
+      neworder = unlist(
+        sapply(X   = c('name','playerChannelId', 'channelId'),
+               FUN = function(x) unique(unlist(lapply(channel, `[[`, x))))
+      ),
       x = rbindlist(
         l = mapply(
           FUN  = function(data, cols) setNames(object = data, nm = cols),
-          data = split_data,
+          data = chunked,
           cols = lapply(X = channel, FUN = rapply, f = c),
           SIMPLIFY = FALSE
         ),
@@ -66,5 +65,28 @@ read_xml_ <- function(...) {
         invokeRestart("muffleWarning")
       }
     }
+  )
+}
+
+
+read_line <- function(data, metadata, n = 1) {
+  read.table(
+    text = gsub(
+      x           = c(fpeek::peek_head(data, n = n, intern = TRUE),
+                      fpeek::peek_tail(data, n = n, intern = TRUE)),
+      pattern     = parse_separator(metadata),
+      replacement = " "
+    )
+  )
+}
+
+
+read_data <- function(data, metadata) {
+  read.table(
+    text = gsub(
+      x = readLines(data, warn = FALSE),
+      pattern = parse_separator(metadata),
+      replacement = " "
+    )
   )
 }
