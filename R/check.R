@@ -1,7 +1,11 @@
 check_input <- function(data, metadata) {
   check_data_cols(data, metadata)
   check_data_rows(data, metadata)
-  check_frame_order(data, metadata)
+}
+
+check_name <- function(metadata) {
+  if (!has_name(x = unlist(parse_channel(metadata)), name = "name"))
+    abort_name()
 }
 
 check_data_cols <- function(data, metadata) {
@@ -20,36 +24,60 @@ check_data_cols <- function(data, metadata) {
 }
 
 check_data_rows <- function(data, metadata) {
-  if (countLines(data) != length(parse_frame(metadata)))
-    warn_data_rows()
+  n     <- countLines(data)
+  frame <- parse_frame(metadata)
+  if (n != length(frame))
+    warn_data_rows(n = n, frame = frame)
 }
 
-check_frame_order <- function(data, metadata) {
+check_frame_range <- function(data, metadata) {
   x <- parse_frame(metadata)
 
   if (is.unsorted(attr(x, "start_frame")) || is.unsorted(attr(x, "end_frame")))
-    warn_frame_order()
+    warn_frame_range()
 
   if (any(attr(x, "end_frame") < attr(x, "start_frame")))
-    warn_frame_order()
+    warn_frame_range()
 }
+
+check_output <- function(data, metadata) {
+
+  frameRange <- iv(
+    start = attr(parse_frame(metadata), "startFrame"),
+    end   = attr(parse_frame(metadata), "endFrame")
+  )
+
+  # iv_between()
+
+}
+
+
 
 warn_data_cols <- function() {
-  warn(
-    paste("The number of columns in `data` is not equal to",
-          "the number of channels in each DataFormatSpecification.")
-  )
+  cli_warn(c(
+    "!" = "The number of columns in data is not equal to
+    the number of channels in each DataFormatSpecification."
+  ))
 }
 
-warn_data_rows <- function() {
-  warn(
-    paste("The number of rows in `data` does not equal",
-          "the frame count range in `metadata`.")
-  )
+warn_data_rows <- function(n, frame) {
+  cli_warn(c(
+    "!" = "Number of rows in {.var data} does not equal
+      the frame count range in {.var metadata}:",
+    "i" = "{.var data} has {n} rows",
+    "i" = "{.var metadata} has frame count range: {frame}"
+  ))
 }
 
-warn_frame_order <- function() {
-  warn(
-    "Problem with frame order. Check startFrame and endFrame in `metadata`."
-  )
+warn_frame_range <- function() {
+  cli_warn(c(
+    "!" = "Problem with frame count range.
+    Check startFrame and endFrame in `metadata`."
+  ))
+}
+
+abort_name <- function() {
+  cli_abort(c(
+    "!" = "`data` does not have a frame parameter."
+  ))
 }

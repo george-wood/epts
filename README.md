@@ -82,7 +82,8 @@ Import the raw data according to the format specification:
 
 ``` r
 read_epts(raw_data, metadata)
-#> Warning: Frames in data are undefined in metadata.
+#> Warning: The number of rows in `data` does not equal the frame count range in
+#> `metadata`.
 #>   frameCount player1_x player1_y player1_z player1_distance player1_avg_speed
 #> 1    1779143      -769     -2013      -500              100              9.63
 #> 2    1779144      -218      1193      2000              100              1.23

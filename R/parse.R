@@ -5,22 +5,36 @@ parse_frame <- function(metadata) {
     f = function(x) as.numeric(sapply(find_dfs(metadata), xml_attr, attr = x))
   )
 
-  start_frame <- eval(sym("startFrame"), framing)
-  end_frame   <- eval(sym("endFrame"),   framing)
-
-  x <- findInterval(
-    x                = min(start_frame):max(end_frame),
-    vec              = end_frame,
-    rightmost.closed = FALSE,
-    all.inside       = FALSE,
-    left.open        = TRUE
-  )
-
-  attr(x, "start_frame") <- start_frame
-  attr(x, "end_frame")   <- end_frame
-  x
+  iv(start = eval(sym("startFrame"), framing),
+     end   = eval(sym("endFrame"), framing) + 1)
 
 }
+
+
+# parse_frame <- function(metadata) {
+#
+#   framing <- Map(
+#     c("startFrame", "endFrame"),
+#     f = function(x) as.numeric(sapply(find_dfs(metadata), xml_attr, attr = x))
+#   )
+#
+#   startFrame <- eval(sym("startFrame"), framing)
+#   endFrame   <- eval(sym("endFrame"),   framing)
+#
+#   x <- findInterval(
+#     x                = min(startFrame):max(endFrame),
+#     vec              = endFrame,
+#     rightmost.closed = FALSE,
+#     all.inside       = FALSE,
+#     left.open        = TRUE
+#   )
+#
+#   attr(x, "startFrame") <- startFrame
+#   attr(x, "endFrame")   <- endFrame
+#   x
+#
+# }
+
 
 parse_channel <- function(metadata) {
 
