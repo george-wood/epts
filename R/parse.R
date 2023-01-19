@@ -79,5 +79,3 @@ parse_separator <- function(metadata, regex = TRUE) {
     separator
 
 }
-
-

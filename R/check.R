@@ -1,6 +1,6 @@
 check_input <- function(data, metadata) {
-  check_data_cols(data, metadata)
-  check_data_rows(data, metadata)
+  check_dim(data, metadata)
+  check_name(metadata)
 }
 
 check_name <- function(metadata) {
@@ -8,7 +8,8 @@ check_name <- function(metadata) {
     abort_name()
 }
 
-check_data_cols <- function(data, metadata) {
+check_dim <- function(data, metadata) {
+
   if (
     !all(
       sapply(
@@ -21,13 +22,13 @@ check_data_cols <- function(data, metadata) {
     )
   )
     warn_data_cols()
-}
 
-check_data_rows <- function(data, metadata) {
   n     <- countLines(data)
   frame <- parse_frame(metadata)
-  if (n != length(frame))
+
+  if (n != max(iv_end(frame) - 1))
     warn_data_rows(n = n, frame = frame)
+
 }
 
 check_frame_range <- function(data, metadata) {
@@ -51,8 +52,6 @@ check_output <- function(data, metadata) {
 
 }
 
-
-
 warn_data_cols <- function() {
   cli_warn(c(
     "!" = "The number of columns in data is not equal to
@@ -62,10 +61,11 @@ warn_data_cols <- function() {
 
 warn_data_rows <- function(n, frame) {
   cli_warn(c(
-    "!" = "Number of rows in {.var data} does not equal
+    "!" = "The number of rows in {.var data} does not equal
       the frame count range in {.var metadata}:",
     "i" = "{.var data} has {n} rows",
-    "i" = "{.var metadata} has frame count range: {frame}"
+    "i" = "{.var metadata} has frame count range:
+      [{iv_start(frame)}, {iv_end(frame) - 1}]"
   ))
 }
 

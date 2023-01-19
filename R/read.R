@@ -12,23 +12,34 @@
 #' read_epts(data, metadata)
 read_epts <- function(data, metadata) {
 
+  check_input(data, metadata)
+
+  channel <- parse_channel(metadata)
+
+  StringRegister_name <- unique(
+    sapply(channel, function(x) eval(sym("name"), x))
+  )
+
   dt <- read_data(data, metadata)
 
-  check_name(metadata)
+  data.table::setnames(
+    dt,
+    old = names(dt)[1:length(StringRegister_name)],
+    new = StringRegister_name,
+    skip_absent = TRUE
+  )
 
-  inFrame <- iv_locate_between(
-    needles  = dt[, 1],
+  frame_in_range <- iv_locate_between(
+    needles  = dt[[StringRegister_name]],
     haystack = parse_frame(metadata),
     no_match = 0L,
     multiple = "warning"
   )
 
-  if (any(eval(sym("haystack"), inFrame) == 0))
+  if (any(eval(sym("haystack"), frame_in_range) == 0))
     warn_frame_range()
 
-  chunked <- split(dt, f = eval(sym("haystack"), inFrame))
-
-  channel <- parse_channel(metadata)
+  chunked <- split(dt, f = eval(sym("haystack"), frame_in_range))
 
   res <-
     rbindlist(
@@ -119,13 +130,17 @@ read_line <- function(data, metadata, n = 1) {
   )
 }
 
-
 read_data <- function(data, metadata) {
-  read.table(
+  fread(
     text = gsub(
-      x = readLines(data, warn = FALSE),
+      x = readChar(con = data,
+                   nchars = file.info(data)$size,
+                   useBytes = TRUE),
       pattern = parse_separator(metadata),
-      replacement = " "
-    )
-  )
+      replacement = "$"
+    ),
+    data.table = TRUE,
+    header = FALSE,
+    sep = "$"
+  )[, .SD, .SDcols = function(x) !all(is.na(x))]
 }
