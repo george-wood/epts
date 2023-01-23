@@ -1,81 +1,60 @@
 parse_frame <- function(metadata) {
-
-  framing <- Map(
-    c("startFrame", "endFrame"),
-    f = function(x) as.numeric(sapply(find_dfs(metadata), xml_attr, attr = x))
+  framing <- sapply(
+    X = c("startFrame", "endFrame"),
+    simplify = FALSE,
+    FUN = function(x) {
+      as.numeric(xml_attr(read_data_format_specification(metadata), attr = x))
+    }
   )
 
-  iv(start = eval(sym("startFrame"), framing),
-     end   = eval(sym("endFrame"), framing) + 1)
-
+  ivs::iv(
+    start = eval(sym("startFrame"), framing),
+    end = eval(sym("endFrame"), framing) + 1
+  )
 }
 
 
-# parse_frame <- function(metadata) {
-#
-#   framing <- Map(
-#     c("startFrame", "endFrame"),
-#     f = function(x) as.numeric(sapply(find_dfs(metadata), xml_attr, attr = x))
-#   )
-#
-#   startFrame <- eval(sym("startFrame"), framing)
-#   endFrame   <- eval(sym("endFrame"),   framing)
-#
-#   x <- findInterval(
-#     x                = min(startFrame):max(endFrame),
-#     vec              = endFrame,
-#     rightmost.closed = FALSE,
-#     all.inside       = FALSE,
-#     left.open        = TRUE
-#   )
-#
-#   attr(x, "startFrame") <- startFrame
-#   attr(x, "endFrame")   <- endFrame
-#   x
-#
-# }
-
-
 parse_channel <- function(metadata) {
-
   lapply(
-    X   = find_dfs(metadata),
+    X = read_data_format_specification(metadata),
     FUN = function(x) {
       mapply(
         FUN = function(attr, xpath) {
           xml_attr(attr = attr, x = xml_find_all(x, xpath))
         },
-        attr  = c(
+        attr = c(
           attr_name(),
           attr_playerChannelId(),
           attr_channelId()
         ),
         xpath = c(
-          path_name(),
-          path_playerChannelId(),
-          path_channelId()
+          path_StringRegister(),
+          path_PlayerChannelRef(),
+          path_BallChannelRef()
         )
       )
     }
   )
-
 }
 
 
-parse_separator <- function(metadata, regex = TRUE) {
+parse_separator <- function(metadata) {
+  x <- read_data_format_specification(metadata)
 
-  separator <-
-    unique(
-      xml_attr(
-        attr    = attr_separator(),
-        x       = find_separator(metadata),
-        default = ""
-      )
-    )
+  path <- c(
+    initial          = ".",
+    PlayerChannelRef = path_SplitRegister("PlayerChannelRef"),
+    BallChannelRef   = path_SplitRegister("BallChannelRef"),
+    playerChannelId  = path_SplitRegister_SplitRegister("PlayerChannelRef"),
+    channelId        = path_SplitRegister_SplitRegister("BallChannelRef")
+  )
 
-  if (regex)
-    paste0("[", paste0(separator, collapse = ""), "]")
-  else
-    separator
-
+  sapply(
+    X = path,
+    simplify = FALSE,
+    FUN = function(p) {
+      sep <- unique(xml_attr(xml_find_all(x, p), attr = attr_separator()))
+      ifelse(length(sep) == 0, NA_character_, sep)
+    }
+  )
 }

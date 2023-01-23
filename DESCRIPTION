@@ -16,7 +16,6 @@ BugReports: https://github.com/george-wood/epts/issues
 Imports: 
     cli,
     data.table,
-    fpeek,
     glue,
     ivs,
     R.utils,

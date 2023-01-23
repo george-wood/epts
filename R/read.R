@@ -11,100 +11,57 @@
 #' metadata <- epts_example("fifa_example.xml")
 #' read_epts(data, metadata)
 read_epts <- function(data, metadata) {
-
   check_input(data, metadata)
 
   channel <- parse_channel(metadata)
 
-  StringRegister_name <- unique(
+  name_channel <- unique(
     sapply(channel, function(x) eval(sym("name"), x))
   )
 
-  dt <- read_data(data, metadata)
+  dt <- read_raw_data(data, metadata)
 
   data.table::setnames(
     dt,
-    old = names(dt)[1:length(StringRegister_name)],
-    new = StringRegister_name,
+    old = names(dt)[seq_along(name_channel)],
+    new = name_channel,
     skip_absent = TRUE
   )
 
-  frame_in_range <- iv_locate_between(
-    needles  = dt[[StringRegister_name]],
+  frame <- ivs::iv_locate_between(
+    needles  = dt[[name_channel]],
     haystack = parse_frame(metadata),
     no_match = 0L,
     multiple = "warning"
   )
 
-  if (any(eval(sym("haystack"), frame_in_range) == 0))
-    warn_frame_range()
+  chunked <- split(dt, f = eval(sym("haystack"), frame))
 
-  chunked <- split(dt, f = eval(sym("haystack"), frame_in_range))
-
-  res <-
-    rbindlist(
-      l = mapply(
-        FUN  = function(data, cols) setNames(object = data, nm = cols),
-        data = chunked,
-        cols = lapply(X = channel, FUN = rapply, f = c),
-        SIMPLIFY = FALSE
-      ),
-      use.names = TRUE,
-      fill = TRUE
-    )
-
-  setcolorder(
-    x = res,
-    neworder = unlist(
-      sapply(X   = c("name", "playerChannelId", "channelId"),
-             FUN = function(x) unique(unlist(lapply(channel, `[[`, x))))
-    )
+  res <- data.table::rbindlist(
+    l = mapply(
+      FUN = function(data, cols) setNames(object = data, nm = cols),
+      data = chunked,
+      cols = lapply(X = channel, FUN = rapply, f = c),
+      SIMPLIFY = FALSE
+    ),
+    use.names = TRUE,
+    fill = TRUE
   )
 
-  setDF(res)
+  data.table::setcolorder(
+    x = res,
+    neworder = unlist(lapply(do.call(what = Map, args = c(c, channel)), unique))
+  )
+
+  # check output
+  if (any(eval(sym("haystack"), frame) == 0)) {
+    warn_frame_range()
+  }
+
+  # return
+  data.table::setDF(res)
   res
-
 }
-
-
-# read_epts <- function(data, metadata) {
-#
-#   check_input(data, metadata)
-#
-#   chunked <-
-#     withCallingHandlers(
-#       expr = split(x = read_data(data, metadata),
-#                    f = parse_frame(metadata)),
-#       warning = function(w) {
-#         if (startsWith(conditionMessage(w), "data length")) {
-#           # warning(call. = FALSE, warn_data_rows())
-#           invokeRestart("muffleWarning")
-#         }
-#       }
-#     )
-#
-#   channel <- parse_channel(metadata)
-#
-#   setDF(
-#     x = setcolorder(
-#       neworder = unlist(
-#         sapply(X   = c('name','playerChannelId', 'channelId'),
-#                FUN = function(x) unique(unlist(lapply(channel, `[[`, x))))
-#       ),
-#       x = rbindlist(
-#         l = mapply(
-#           FUN  = function(data, cols) setNames(object = data, nm = cols),
-#           data = chunked,
-#           cols = lapply(X = channel, FUN = rapply, f = c),
-#           SIMPLIFY = FALSE
-#         ),
-#         use.names = TRUE,
-#         fill = TRUE
-#       )
-#     )
-#   )[]
-#
-# }
 
 
 read_xml_ <- function(...) {
@@ -118,29 +75,33 @@ read_xml_ <- function(...) {
   )
 }
 
-
-read_line <- function(data, metadata, n = 1) {
-  read.table(
-    text = gsub(
-      x           = c(fpeek::peek_head(data, n = n, intern = TRUE),
-                      fpeek::peek_tail(data, n = n, intern = TRUE)),
-      pattern     = parse_separator(metadata),
-      replacement = " "
-    )
+read_data_format_specification <- function(metadata) {
+  xml_find_all(
+    x = read_xml_(metadata),
+    xpath = path_DataFormatSpecification()
   )
 }
 
-read_data <- function(data, metadata) {
-  fread(
-    text = gsub(
-      x = readChar(con = data,
-                   nchars = file.info(data)$size,
-                   useBytes = TRUE),
-      pattern = parse_separator(metadata),
-      replacement = "$"
-    ),
+
+read_raw_data <- function(data, metadata, n = NULL) {
+  if (missing(n)) {
+    x <- readChar(
+      con = data,
+      nchars = file.info(data)$size,
+      useBytes = TRUE
+    )
+  } else {
+    x <- readLines(
+      con = data,
+      n = n,
+      warn = FALSE
+    )
+  }
+
+  data.table::fread(
+    text = simplify_separator(x = x, sep = parse_separator(metadata)),
     data.table = TRUE,
     header = FALSE,
-    sep = "$"
-  )[, .SD, .SDcols = function(x) !all(is.na(x))]
+    sep = "\t"
+  )
 }

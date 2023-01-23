@@ -1,17 +1,15 @@
-replace_sep <- function(x, tree) {
-
+simplify_separator <- function(x, sep) {
   gsub(
     x = gsub(
       x = x,
-      pattern = glue(
-        "{tree$initial}(?=$|\n)|{tree$PlayerChannelRef}(?={tree$initial})"
+      pattern = glue::glue(
+        "{sep$initial}(?=$|\n)|{sep$PlayerChannelRef}(?={sep$initial})"
       ),
       replacement = "",
       perl = TRUE
     ),
-    pattern = paste0(tree[!is.na(tree)], collapse = "|"),
-    replacement = "@",
+    pattern = paste0(sep[!is.na(sep)], collapse = "|"),
+    replacement = "\t",
     perl = TRUE
   )
-
 }
