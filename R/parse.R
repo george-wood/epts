@@ -3,7 +3,12 @@ parse_frame <- function(metadata) {
     X = c("startFrame", "endFrame"),
     simplify = FALSE,
     FUN = function(x) {
-      as.numeric(xml_attr(read_data_format_specification(metadata), attr = x))
+      as.numeric(
+        xml_attr(
+          read_data_format_specification(metadata),
+          attr = x
+        )
+      )
     }
   )
 
@@ -13,6 +18,7 @@ parse_frame <- function(metadata) {
   )
 }
 
+tools::package_dependencies("epts")
 
 parse_channel <- function(metadata) {
   lapply(
@@ -23,38 +29,49 @@ parse_channel <- function(metadata) {
           xml_attr(attr = attr, x = xml_find_all(x, xpath))
         },
         attr = c(
-          attr_name(),
-          attr_playerChannelId(),
-          attr_channelId()
+          "name",
+          "playerChannelId",
+          "channelId"
         ),
         xpath = c(
-          path_StringRegister(),
-          path_PlayerChannelRef(),
-          path_BallChannelRef()
+          "StringRegister",
+          "SplitRegister/SplitRegister/PlayerChannelRef",
+          "SplitRegister/BallChannelRef"
         )
       )
     }
   )
 }
 
-
 parse_separator <- function(metadata) {
-  x <- read_data_format_specification(metadata)
-
-  path <- c(
-    initial          = ".",
-    PlayerChannelRef = path_SplitRegister("PlayerChannelRef"),
-    BallChannelRef   = path_SplitRegister("BallChannelRef"),
-    playerChannelId  = path_SplitRegister_SplitRegister("PlayerChannelRef"),
-    channelId        = path_SplitRegister_SplitRegister("BallChannelRef")
-  )
-
   sapply(
-    X = path,
+    X = xpath_separator(),
     simplify = FALSE,
-    FUN = function(p) {
-      sep <- unique(xml_attr(xml_find_all(x, p), attr = attr_separator()))
-      ifelse(length(sep) == 0, NA_character_, sep)
+    FUN = function(xpath) {
+      unique(
+        xml_attr(
+          xml_find_all(
+            x = read_data_format_specification(metadata),
+            xpath = xpath
+          ),
+          attr = "separator"
+        )
+      )
     }
+  )
+}
+
+xpath_separator <- function() {
+  c(
+    initial =
+      ".",
+    PlayerChannelRef =
+      "SplitRegister[descendant::PlayerChannelRef]",
+    BallChannelRef =
+      "SplitRegister[descendant::BallChannelRef]",
+    playerChannelId =
+      "SplitRegister/SplitRegister[descendant::PlayerChannelRef]",
+    channelId =
+      "SplitRegister/SplitRegister[descendant::BallChannelRef]"
   )
 }

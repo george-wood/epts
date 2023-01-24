@@ -78,10 +78,9 @@ read_xml_ <- function(...) {
 read_data_format_specification <- function(metadata) {
   xml_find_all(
     x = read_xml_(metadata),
-    xpath = path_DataFormatSpecification()
+    xpath = "//DataFormatSpecification"
   )
 }
-
 
 read_raw_data <- function(data, metadata, n = NULL) {
   if (missing(n)) {
@@ -99,9 +98,25 @@ read_raw_data <- function(data, metadata, n = NULL) {
   }
 
   data.table::fread(
-    text = simplify_separator(x = x, sep = parse_separator(metadata)),
+    text = replace_separator(x = x, sep = parse_separator(metadata)),
     data.table = TRUE,
     header = FALSE,
     sep = "\t"
+  )
+}
+
+replace_separator <- function(x, sep) {
+  gsub(
+    x = gsub(
+      x = x,
+      pattern = glue::glue(
+        "{sep$initial}(?=$|\n)|{sep$PlayerChannelRef}(?={sep$initial})"
+      ),
+      replacement = "",
+      perl = TRUE
+    ),
+    pattern = paste0(sep[lengths(sep) != 0], collapse = "|"),
+    replacement = "\t",
+    perl = TRUE
   )
 }
