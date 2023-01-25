@@ -14,7 +14,7 @@ check_dim <- function(data, metadata) {
     !all(
       sapply(
         X = sapply(
-          X = parse_channel(metadata), \(x) sum(lengths(x))
+          X = parse_channel(metadata), function(x) sum(lengths(x))
         ),
         FUN = identical,
         ncol(read_raw_data(data, metadata, n = 2))

@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: George Wood \email{georgebwood@gmail.com} (\href{https://orcid.org/0000-0003-0046-4465}{ORCID})
+\strong{Maintainer}: George Wood \email{georgebwood@gmail.com}
 
 }
 \keyword{internal}
