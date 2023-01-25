@@ -18,8 +18,6 @@ parse_frame <- function(metadata) {
   )
 }
 
-tools::package_dependencies("epts")
-
 parse_channel <- function(metadata) {
   lapply(
     X = read_data_format_specification(metadata),
