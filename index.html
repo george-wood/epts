@@ -117,7 +117,11 @@
 <p>Import the raw data according to the format specification:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/read_epts.html">read_epts</a></span><span class="op">(</span><span class="va">raw_data</span>, <span class="va">metadata</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: The number of rows in `data` does not equal the frame count range in</span></span>
+<span><span class="co">#&gt; Warning: ! The number of rows in `data` does not equal the frame count range in</span></span>
+<span><span class="co">#&gt;   `metadata`:</span></span>
+<span><span class="co">#&gt; ℹ `data` has 2 rows</span></span>
+<span><span class="co">#&gt; ℹ `metadata` has frame count range: [1, 15000]</span></span>
+<span><span class="co">#&gt; Warning: ! Problem with frame count range. Check startFrame and endFrame in</span></span>
 <span><span class="co">#&gt; `metadata`.</span></span>
 <span><span class="co">#&gt;   frameCount player1_x player1_y player1_z player1_distance player1_avg_speed</span></span>
 <span><span class="co">#&gt; 1    1779143      -769     -2013      -500              100              9.63</span></span>
@@ -143,6 +147,7 @@
 <span><span class="co">#&gt;   player3_max_heartbeat     x   y   z</span></span>
 <span><span class="co">#&gt; 1                   175 -2656 367 100</span></span>
 <span><span class="co">#&gt; 2                   182  -521 816  11</span></span></code></pre></div>
+<p>The example data is misspecified: the raw data includes frames that are not defined in the data format specification. The user is warned about this.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
