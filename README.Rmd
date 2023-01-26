@@ -74,3 +74,5 @@ Import the raw data according to the format specification:
 ```{r read}
 read_epts(raw_data, metadata)
 ```
+
+The example data is misspecified: the raw data includes frames that are not defined in the data format specification. The user is warned about this.

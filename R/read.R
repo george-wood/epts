@@ -39,7 +39,9 @@ read_epts <- function(data, metadata) {
 
   res <- data.table::rbindlist(
     l = mapply(
-      FUN = function(data, cols) setNames(object = data, nm = cols),
+      FUN = function(data, cols) {
+        data.table::setnames(x = data, new = cols)
+      },
       data = chunked,
       cols = lapply(X = channel, FUN = rapply, f = c),
       SIMPLIFY = FALSE

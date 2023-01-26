@@ -82,7 +82,11 @@ Import the raw data according to the format specification:
 
 ``` r
 read_epts(raw_data, metadata)
-#> Warning: The number of rows in `data` does not equal the frame count range in
+#> Warning: ! The number of rows in `data` does not equal the frame count range in
+#>   `metadata`:
+#> ℹ `data` has 2 rows
+#> ℹ `metadata` has frame count range: [1, 15000]
+#> Warning: ! Problem with frame count range. Check startFrame and endFrame in
 #> `metadata`.
 #>   frameCount player1_x player1_y player1_z player1_distance player1_avg_speed
 #> 1    1779143      -769     -2013      -500              100              9.63
@@ -109,3 +113,7 @@ read_epts(raw_data, metadata)
 #> 1                   175 -2656 367 100
 #> 2                   182  -521 816  11
 ```
+
+The example data is misspecified: the raw data includes frames that are
+not defined in the data format specification. The user is warned about
+this.
