@@ -4,7 +4,6 @@
 ## usethis namespace: start
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
-#' @importFrom data.table data.table
 #' @importFrom data.table fread
 #' @importFrom data.table rbindlist
 #' @importFrom data.table setcolorder
