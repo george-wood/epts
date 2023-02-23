@@ -19,6 +19,5 @@ Imports:
     data.table,
     glue,
     ivs,
-    R.utils,
     rlang,
     xml2

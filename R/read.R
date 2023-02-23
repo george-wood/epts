@@ -11,64 +11,41 @@
 #' metadata <- epts_example("fifa_example.xml")
 #' read_epts(data, metadata)
 read_epts <- function(data, metadata) {
-  check_input(data, metadata)
 
+  data    <- rectangular(x = read_raw_data(data), metadata = metadata)
   channel <- parse_channel(metadata)
-
-  name_channel <- unique(
-    sapply(channel, function(x) eval(sym("name"), x))
-  )
-
-  dt <- read_raw_data(data, metadata)
-
-  data.table::setnames(
-    dt,
-    old = names(dt)[seq_along(name_channel)],
-    new = name_channel,
-    skip_absent = TRUE
-  )
-
-  frame <- ivs::iv_locate_between(
-    needles  = dt[[name_channel]],
+  frame   <- ivs::iv_locate_between(
+    needles  = data[[1]],
     haystack = parse_frame(metadata),
     no_match = 0L,
     multiple = "warning"
   )
 
-  chunked <- split(dt, f = eval(sym("haystack"), frame))
+  data.table::setDF(
+    data.table::setcolorder(
+      data.table::rbindlist(
+        l = mapply(
+          FUN = function(data, cols) {
+            data.table::setnames(x = data, new = cols)
+          },
+          data = split(data, f = frame$haystack),
+          cols = lapply(X = channel, FUN = rapply, f = c),
+          SIMPLIFY = FALSE
+        ),
+        use.names = TRUE,
+        fill = TRUE
+      ),
+      neworder = unlist(
+        lapply(do.call(what = Map, args = c(c, channel)), unique)
+      )
+    )
+  )[]
 
-  res <- data.table::rbindlist(
-    l = mapply(
-      FUN = function(data, cols) {
-        data.table::setnames(x = data, new = cols)
-      },
-      data = chunked,
-      cols = lapply(X = channel, FUN = rapply, f = c),
-      SIMPLIFY = FALSE
-    ),
-    use.names = TRUE,
-    fill = TRUE
-  )
-
-  data.table::setcolorder(
-    x = res,
-    neworder = unlist(lapply(do.call(what = Map, args = c(c, channel)), unique))
-  )
-
-  # check output
-  if (any(eval(sym("haystack"), frame) == 0)) {
-    warn_frame_range()
-  }
-
-  # return
-  data.table::setDF(res)
-  res
 }
-
 
 read_xml_ <- function(...) {
   withCallingHandlers(
-    expr = read_xml(...),
+    expr = xml2::read_xml(...),
     warning = function(w) {
       if (startsWith(conditionMessage(w), "Unsupported version")) {
         invokeRestart("muffleWarning")
@@ -78,47 +55,48 @@ read_xml_ <- function(...) {
 }
 
 read_data_format_specification <- function(metadata) {
-  xml_find_all(
+  xml2::xml_find_all(
     x = read_xml_(metadata),
     xpath = "//DataFormatSpecification"
   )
 }
 
-read_raw_data <- function(data, metadata, n = NULL) {
-  if (missing(n)) {
-    x <- readChar(
+read_raw_data <- function(data, n) {
+  if (missing(n) && !is.na(file.info(data)$size)) {
+    readChar(
       con = data,
       nchars = file.info(data)$size,
       useBytes = TRUE
     )
   } else {
-    x <- readLines(
+    readLines(
       con = data,
-      n = n,
+      n = if (missing(n)) -1L else n,
       warn = FALSE
     )
   }
-
-  data.table::fread(
-    text = replace_separator(x = x, sep = parse_separator(metadata)),
-    data.table = TRUE,
-    header = FALSE,
-    sep = "\t"
-  )
 }
 
-replace_separator <- function(x, sep) {
-  gsub(
-    x = gsub(
-      x = x,
-      pattern = glue::glue(
-        "{sep$initial}(?=$|\n)|{sep$PlayerChannelRef}(?={sep$initial})"
+rectangular <- function(x, metadata) {
+
+  sep <- parse_separator(metadata)
+
+  data.table::fread(
+    data.table = TRUE,
+    header     = FALSE,
+    sep        = "\t",
+    text       = gsub(
+      x = gsub(
+        x = x,
+        pattern = glue::glue(
+          "{sep$initial}(?=$|\n)|{sep$playerChannelRef}(?={sep$initial})"
+        ),
+        replacement = "",
+        perl = TRUE
       ),
-      replacement = "",
+      pattern = paste0(sep[lengths(sep) != 0], collapse = "|"),
+      replacement = "\t",
       perl = TRUE
-    ),
-    pattern = paste0(sep[lengths(sep) != 0], collapse = "|"),
-    replacement = "\t",
-    perl = TRUE
+    )
   )
 }

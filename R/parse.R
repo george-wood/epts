@@ -4,7 +4,7 @@ parse_frame <- function(metadata) {
     simplify = FALSE,
     FUN = function(x) {
       as.numeric(
-        xml_attr(
+        xml2::xml_attr(
           read_data_format_specification(metadata),
           attr = x
         )
@@ -12,10 +12,7 @@ parse_frame <- function(metadata) {
     }
   )
 
-  ivs::iv(
-    start = eval(sym("startFrame"), framing),
-    end = eval(sym("endFrame"), framing) + 1
-  )
+  ivs::iv(start = framing$startFrame, end = framing$endFrame + 1)
 }
 
 parse_channel <- function(metadata) {
@@ -24,7 +21,7 @@ parse_channel <- function(metadata) {
     FUN = function(x) {
       mapply(
         FUN = function(attr, xpath) {
-          xml_attr(attr = attr, x = xml_find_all(x, xpath))
+          xml2::xml_attr(attr = attr, x = xml2::xml_find_all(x, xpath))
         },
         attr = c(
           "name",
@@ -47,8 +44,8 @@ parse_separator <- function(metadata) {
     simplify = FALSE,
     FUN = function(xpath) {
       unique(
-        xml_attr(
-          xml_find_all(
+        xml2::xml_attr(
+          xml2::xml_find_all(
             x = read_data_format_specification(metadata),
             xpath = xpath
           ),
@@ -63,9 +60,9 @@ xpath_separator <- function() {
   c(
     initial =
       ".",
-    PlayerChannelRef =
+    playerChannelRef =
       "SplitRegister[descendant::PlayerChannelRef]",
-    BallChannelRef =
+    ballChannelRef =
       "SplitRegister[descendant::BallChannelRef]",
     playerChannelId =
       "SplitRegister/SplitRegister[descendant::PlayerChannelRef]",

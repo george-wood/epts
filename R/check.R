@@ -1,6 +1,6 @@
-check_input <- function(data, metadata) {
-  check_dim(data, metadata)
+check_input <- function(dt, metadata) {
   check_name(metadata)
+  check_dim(dt, metadata)
 }
 
 check_name <- function(metadata) {
@@ -9,7 +9,7 @@ check_name <- function(metadata) {
   }
 }
 
-check_dim <- function(data, metadata) {
+check_dim <- function(dt, metadata) {
   if (
     !all(
       sapply(
@@ -17,30 +17,29 @@ check_dim <- function(data, metadata) {
           X = parse_channel(metadata), function(x) sum(lengths(x))
         ),
         FUN = identical,
-        ncol(read_raw_data(data, metadata, n = 2))
+        ncol(dt)
       )
     )
   ) {
     warn_data_cols()
   }
 
-  n <- countLines(data)
   frame <- parse_frame(metadata)
 
-  if (n != max(ivs::iv_end(frame) - 1)) {
-    warn_data_rows(n = n, frame = frame)
+  if (nrow(dt) != max(ivs::iv_end(frame) - 1)) {
+    warn_data_rows(n = nrow(dt), frame = frame)
   }
 }
 
 check_frame_range <- function(data, metadata) {
-  x <- parse_frame(metadata)
+  frame <- parse_frame(metadata)
 
-  if (is.unsorted(attr(x, "start_frame")) ||
-    is.unsorted(attr(x, "end_frame"))) {
+  if (is.unsorted(attr(frame, "start_frame")) ||
+    is.unsorted(attr(frame, "end_frame"))) {
     warn_frame_range()
   }
 
-  if (any(attr(x, "end_frame") < attr(x, "start_frame"))) {
+  if (any(attr(frame, "end_frame") < attr(frame, "start_frame"))) {
     warn_frame_range()
   }
 }
