@@ -18,19 +18,35 @@ Systems](https://www.fifa.com/technical/football-technology/standards/epts)
 ## Overview
 
 EPTS is a broad term for camera-based and wearable technologies that
-measure and track football (soccer) players. This includes positioning
-systems that track player and ball positions, accelerometers,
-gyroscopes, and other technologies. Such data is widely used in sports
-analytics.
+measure and track players and the ball in football (soccer). This
+includes positioning systems that track player and ball positions,
+accelerometers, gyroscopes, and other technologies. The data produced by
+EPTS is widely used for analytics. However, as the number of vendors
+providing EPTS data has increased, so has the complexity of integrating
+this data into analytical pipelines, as noted by FIFA[^1]:
 
-FIFA and FC Barcelona have developed a standard format for exchanging
-EPTS data. The standard format requires data providers to produce two
-documents when exchanging data:
+> Alongside the increasing adoption of these devices, the variety of
+> brands and vendors have also increased up to tens of providers in this
+> timeframe. While more data is being generated, the operational
+> maintenance and integration of this information becomes everyday more
+> complex. A central issue is that each different vendor defines its own
+> format and specification for the data that is being provided. While is
+> typical to also provide software to interpret this data, the
+> increasing availability of sources of information and the need of data
+> centralization makes very difficult for clubs to keep the growing pace
+> of this industry, regarding the needs for continuous integration and
+> maintainability of data. Also, the ad-hoc nature of provided formats
+> makes harder to integrate information from different sources, making
+> progress in this area slower.
+
+In response to this problem, FIFA and FC Barcelona have developed a
+standard format for exchanging EPTS data. The standard format requires
+that vendors produce two files when exchanging data:
 
 - A raw data file, which contains the actual data in a format that can
-  be parsed line by line.
-- An xml file containing metadata and a data format specification that
-  defines the format of the raw data file.
+  be parsed line by line
+- An xml file, which contains a data format specification that defines
+  the format of the raw data file alongside other metadata
 
 The epts package makes it easy to read the raw data file according to
 the data format specification.
@@ -39,18 +55,18 @@ the data format specification.
 
 With epts, you can:
 
-- Import the raw data file according to the data format specification.
+- Import the raw data file according to the data format specification
 - Extract metadata, including specific fields such as the frame rate or
-  team names.
+  team name
 
-When importing raw data, epts returns a `data.frame` with column names
-as defined in the data format specification. For flexibility, the
+When importing raw data, epts always returns a `data.frame` with column
+names as defined in the data format specification. For flexibility, the
 metadata is extracted as a `list`.
 
 ## Installation
 
 You can install the development version of epts from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/) using:
 
 ``` r
 # install.packages("devtools")
@@ -82,12 +98,6 @@ Import the raw data according to the format specification:
 
 ``` r
 read_epts(raw_data, metadata)
-#> Warning: ! The number of rows in `data` does not equal the frame count range in
-#>   `metadata`:
-#> ℹ `data` has 2 rows
-#> ℹ `metadata` has frame count range: [1, 15000]
-#> Warning: ! Problem with frame count range. Check startFrame and endFrame in
-#> `metadata`.
 #>   frameCount player1_x player1_y player1_z player1_distance player1_avg_speed
 #> 1    1779143      -769     -2013      -500              100              9.63
 #> 2    1779144      -218      1193      2000              100              1.23
@@ -114,6 +124,9 @@ read_epts(raw_data, metadata)
 #> 2                   182  -521 816  11
 ```
 
-The example data is misspecified: the raw data includes frames that are
-not defined in the data format specification. The user is warned about
-this.
+The example data provided by FIFA is misspecified: the raw data includes
+frames that are not defined in the data format specification. The user
+is warned about this.
+
+[^1]: [FIFA Standard Data Transfer
+    Format](https://digitalhub.fifa.com/m/477d8daa7f0ac4c9/original/standard-transfer-format-documentation.pdf)
