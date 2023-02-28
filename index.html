@@ -73,11 +73,14 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>EPTS is a broad term for camera-based and wearable technologies that measure and track football (soccer) players. This includes positioning systems that track player and ball positions, accelerometers, gyroscopes, and other technologies. Such data is widely used in sports analytics.</p>
-<p>FIFA and FC Barcelona have developed a standard format for exchanging EPTS data. The standard format requires data providers to produce two documents when exchanging data:</p>
+<p>EPTS is a broad term for camera-based and wearable technologies that measure and track players and the ball in football (soccer). This includes positioning systems that track player and ball positions, accelerometers, gyroscopes, and other technologies. The data produced by EPTS is widely used for analytics. However, as the number of vendors providing EPTS data has increased, so has the complexity of integrating this data into analytical pipelines, as noted by FIFA<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;&lt;a href="https://digitalhub.fifa.com/m/477d8daa7f0ac4c9/original/standard-transfer-format-documentation.pdf" class="external-link"&gt;FIFA Standard Data Transfer Format&lt;/a&gt;&lt;/p&gt;'><sup>1</sup></a>:</p>
+<blockquote>
+<p>Alongside the increasing adoption of these devices, the variety of brands and vendors have also increased up to tens of providers in this timeframe. While more data is being generated, the operational maintenance and integration of this information becomes everyday more complex. A central issue is that each different vendor defines its own format and specification for the data that is being provided. While is typical to also provide software to interpret this data, the increasing availability of sources of information and the need of data centralization makes very difficult for clubs to keep the growing pace of this industry, regarding the needs for continuous integration and maintainability of data. Also, the ad-hoc nature of provided formats makes harder to integrate information from different sources, making progress in this area slower.</p>
+</blockquote>
+<p>In response to this problem, FIFA and FC Barcelona have developed a standard format for exchanging EPTS data. The standard format requires that vendors produce two files when exchanging data:</p>
 <ul>
-<li>A raw data file, which contains the actual data in a format that can be parsed line by line.</li>
-<li>An xml file containing metadata and a data format specification that defines the format of the raw data file.</li>
+<li>A raw data file, which contains the actual data in a format that can be parsed line by line</li>
+<li>An xml file, which contains a data format specification that defines the format of the raw data file alongside other metadata</li>
 </ul>
 <p>The epts package makes it easy to read the raw data file according to the data format specification.</p>
 </div>
@@ -86,15 +89,15 @@
 </h2>
 <p>With epts, you can:</p>
 <ul>
-<li>Import the raw data file according to the data format specification.</li>
-<li>Extract metadata, including specific fields such as the frame rate or team names.</li>
+<li>Import the raw data file according to the data format specification</li>
+<li>Extract metadata, including specific fields such as the frame rate or team name</li>
 </ul>
-<p>When importing raw data, epts returns a <code>data.frame</code> with column names as defined in the data format specification. For flexibility, the metadata is extracted as a <code>list</code>.</p>
+<p>When importing raw data, epts always returns a <code>data.frame</code> with column names as defined in the data format specification. For flexibility, the metadata is extracted as a <code>list</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of epts from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>You can install the development version of epts from <a href="https://github.com/" class="external-link">GitHub</a> using:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"george-wood/epts"</span><span class="op">)</span></span></code></pre></div>
@@ -117,12 +120,6 @@
 <p>Import the raw data according to the format specification:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/read_epts.html">read_epts</a></span><span class="op">(</span><span class="va">raw_data</span>, <span class="va">metadata</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: ! The number of rows in `data` does not equal the frame count range in</span></span>
-<span><span class="co">#&gt;   `metadata`:</span></span>
-<span><span class="co">#&gt; ℹ `data` has 2 rows</span></span>
-<span><span class="co">#&gt; ℹ `metadata` has frame count range: [1, 15000]</span></span>
-<span><span class="co">#&gt; Warning: ! Problem with frame count range. Check startFrame and endFrame in</span></span>
-<span><span class="co">#&gt; `metadata`.</span></span>
 <span><span class="co">#&gt;   frameCount player1_x player1_y player1_z player1_distance player1_avg_speed</span></span>
 <span><span class="co">#&gt; 1    1779143      -769     -2013      -500              100              9.63</span></span>
 <span><span class="co">#&gt; 2    1779144      -218      1193      2000              100              1.23</span></span>
@@ -147,9 +144,11 @@
 <span><span class="co">#&gt;   player3_max_heartbeat     x   y   z</span></span>
 <span><span class="co">#&gt; 1                   175 -2656 367 100</span></span>
 <span><span class="co">#&gt; 2                   182  -521 816  11</span></span></code></pre></div>
-<p>The example data is misspecified: the raw data includes frames that are not defined in the data format specification. The user is warned about this.</p>
+<p>The example data provided by FIFA is misspecified: the raw data includes frames that are not defined in the data format specification. The user is warned about this.</p>
 </div>
 </div>
+
+
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
