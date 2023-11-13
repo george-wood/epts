@@ -15,7 +15,7 @@ read_epts <- function(data, metadata) {
   data    <- rectangular(x = read_raw_data(data), metadata = metadata)
   channel <- parse_channel(metadata)
 
-  frame   <- ivs::iv_locate_between(
+  frame <- ivs::iv_locate_between(
     needles  = data[[1]],
     haystack = parse_frame(metadata),
     no_match = 0L,
